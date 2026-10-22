@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0e3b2c"><title>Mon profil — CAMPUS DIGITAL</title><link rel="stylesheet" href="css/style.css"></head>
+<body class="page-profil"><header id="hd"></header><main><div id="msg" class="msg" hidden></div>
+<section class="profile-hero" aria-labelledby="pf-nom"><div class="avatar" id="avatar" aria-hidden="true">CD</div><div class="profile-id"><h1 id="pf-nom">Mon profil</h1><p id="pf-sub" class="hint"></p><div id="pf-tags" class="tags"></div></div></section>
+<section class="stats" aria-label="Résumé"><div class="stat"><b id="s-pts">0</b><span>points</span></div><div class="stat"><b id="s-vues">0</b><span>formations vues</span></div><div class="stat"><b id="s-miss">0</b><span>missions validées</span></div><div class="stat"><b id="s-docs">0</b><span>documents débloqués</span></div></section>
+<section class="card catalog"><h2>Fiche étudiant</h2><dl id="fiche" class="fiche"></dl><p id="ver-line" class="hint"><span id="ver"></span> <button id="verif" type="button" class="btn">Renvoyer la vérification</button></p></section>
+<section class="card catalog"><h2>Mon abonnement</h2><p><span id="abo" class="tag">…</span></p><p>Début : <b id="deb">—</b> · Expiration : <b id="exp">—</b></p><p><a class="btn dk" href="abonnement.html">Premium</a> <a class="btn" href="missions.html">Mes missions</a> <span id="wa"></span></p></section>
+<section aria-labelledby="t-vues"><h2 id="t-vues">Formations que j’ai consultées</h2><div id="vues" class="grid">Chargement…</div></section>
+<section aria-labelledby="t-reco"><h2 id="t-reco">Recommandées pour moi</h2><p class="hint">Selon ta faculté et ton niveau.</p><div id="reco" class="grid"></div></section>
+<section aria-labelledby="t-docs"><h2 id="t-docs">Mes documents débloqués</h2><div id="docs" class="grid"></div></section>
+<details class="card"><summary><b>Modifier mes informations</b></summary>
+<form id="f" novalidate><div class="form-row"><div><label for="prenom">Prénom</label><input id="prenom" autocomplete="given-name"></div><div><label for="nom">Nom</label><input id="nom" autocomplete="family-name"></div></div>
+<div class="form-row"><div><label for="tel">Téléphone</label><input id="tel" type="tel" autocomplete="tel"></div><div><label for="ville">Ville</label><input id="ville"></div></div>
+<label for="univ">Université ou établissement</label><input id="univ">
+<div class="form-row"><div><label for="faculte">Faculté</label><select id="faculte"><option value="">—</option></select></div><div><label for="niveau">Niveau d’études</label><select id="niveau"><option value="">—</option></select></div></div>
+<label for="formation">Formation / filière</label><input id="formation">
+<p class="hint">Ton rôle, ton abonnement, tes points et tes accès sont gérés par l’équipe : tu ne peux pas les modifier toi-même.</p>
+<button id="save" class="btn dk" type="submit">Enregistrer</button></form></details>
+</main><footer id="ft"></footer><script type="module" src="js/profil.js"></script></body></html>

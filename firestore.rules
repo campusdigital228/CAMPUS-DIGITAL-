@@ -1,0 +1,215 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Fonctions communes ----------
+    function signed() { return request.auth != null; }
+
+    // Administrateur = e-mail autorisé ET e-mail vérifié (sinon n'importe qui pourrait créer un compte
+    // e-mail/mot de passe avec l'adresse d'un administrateur et obtenir ses droits).
+    function admin() {
+      return signed()
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in ['tameclor@gmail.com', 'rtameclo@gmail.com'];
+    }
+    function userPath() { return /databases/$(database)/documents/users/$(request.auth.uid); }
+    function premium() {
+      return signed() && exists(userPath())
+        && get(userPath()).data.subscriptionStatus == 'active'
+        && get(userPath()).data.subscriptionExpiresAt is timestamp
+        && get(userPath()).data.subscriptionExpiresAt > request.time;
+    }
+    function purchasePath(resourceId) {
+      return /databases/$(database)/documents/achats/$(request.auth.uid + '_' + resourceId);
+    }
+    function hasPurchase(resourceId) {
+      return signed() && exists(purchasePath(resourceId))
+        && get(purchasePath(resourceId)).data.statut == 'valide';
+    }
+    // Une mission doit être active et non expirée pour recevoir une soumission
+    function missionOpen(missionId) {
+      let m = get(/databases/$(database)/documents/missions/$(missionId)).data;
+      return m.active == true
+        && (!('dateLimiteTs' in m) || m.dateLimiteTs == null || request.time < m.dateLimiteTs);
+    }
+    // Obligation de suivre TikTok / YouTube / chaîne WhatsApp : l'accès aux formations exige une validation admin (suivi_reseaux/{uid}.statut == 'valide')
+    function socialPath() { return /databases/$(database)/documents/suivi_reseaux/$(request.auth.uid); }
+    function socialOk() {
+      return signed() && exists(socialPath()) && get(socialPath()).data.statut == 'valide';
+    }
+    function okImg(d, k) { return d[k] is string && d[k].size() > 500 && d[k].size() <= 250000; }
+    function okText(d, k, max) { return !(k in d) || (d[k] is string && d[k].size() <= max); }
+    function validProfile(d) {
+      return okText(d, 'nom', 120) && okText(d, 'prenom', 80) && okText(d, 'nomFamille', 80)
+        && okText(d, 'telephone', 30) && okText(d, 'universite', 120) && okText(d, 'faculte', 80)
+        && okText(d, 'formation', 120) && okText(d, 'niveau', 40) && okText(d, 'ville', 80);
+    }
+
+    // ---------- Profils étudiants ----------
+    // L'étudiant ne peut écrire QUE ses informations personnelles. Rôle, Premium, points, paiement : admin uniquement.
+    match /users/{uid} {
+      allow read: if signed() && (request.auth.uid == uid || admin());
+      allow create: if signed() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['nom', 'prenom', 'nomFamille', 'telephone', 'universite', 'faculte', 'formation', 'niveau', 'ville', 'email', 'createdAt'])
+        && request.resource.data.email == request.auth.token.email
+        && validProfile(request.resource.data);
+      allow update: if signed() && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nom', 'prenom', 'nomFamille', 'telephone', 'universite', 'faculte', 'formation', 'niveau', 'ville'])
+        && validProfile(request.resource.data);
+      allow create, update, delete: if admin();
+    }
+
+    // Formations consultées par l'étudiant (historique personnel, id = id de la formation)
+    match /users/{uid}/vues/{vid} {
+      allow read: if signed() && (request.auth.uid == uid || admin());
+      allow create, update: if signed() && request.auth.uid == uid
+        && vid == request.resource.data.formationId
+        && request.resource.data.keys().hasOnly(['formationId', 'titre', 'faculte', 'niveau', 'derniereVue', 'nombre'])
+        && request.resource.data.nombre is int;
+      allow delete: if signed() && request.auth.uid == uid;
+    }
+
+    // Lecture admin de toutes les consultations (tableau de bord : formations les plus consultées)
+    match /{path=**}/vues/{vid} {
+      allow read: if admin();
+    }
+
+    // ---------- Avis et notes sur les formations ----------
+    // id = uid_formationId. Il faut avoir consulté la formation. L'auteur ne peut modifier que note/commentaire ;
+    // la visibilité (modération) est réservée à l'administration.
+    match /avis/{id} {
+      allow read: if admin() || resource.data.visible == true;
+      allow create: if signed()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.formationId is string
+        && id == request.auth.uid + '_' + request.resource.data.formationId
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid)/vues/$(request.resource.data.formationId))
+        && request.resource.data.note is int && request.resource.data.note >= 1 && request.resource.data.note <= 5
+        && request.resource.data.commentaire is string && request.resource.data.commentaire.size() <= 500
+        && request.resource.data.visible == true
+        && request.resource.data.keys().hasOnly(['uid', 'formationId', 'formationTitre', 'note', 'commentaire', 'auteur', 'visible', 'createdAt', 'updatedAt']);
+      allow update: if signed() && resource.data.uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['note', 'commentaire', 'updatedAt'])
+        && request.resource.data.note is int && request.resource.data.note >= 1 && request.resource.data.note <= 5
+        && request.resource.data.commentaire is string && request.resource.data.commentaire.size() <= 500;
+      allow delete: if signed() && resource.data.uid == request.auth.uid;
+      allow create, update, delete: if admin();
+    }
+
+    // ---------- Suivi des réseaux sociaux (accès aux formations) ----------
+    // id = uid. L'étudiant envoie 3 captures (images compressées en texte) avec le statut « en_attente » ; seul l'admin peut
+    // passer à « valide » ou « rejete ». Après un refus, l'étudiant peut seulement renvoyer de nouvelles captures.
+    match /suivi_reseaux/{uid} {
+      allow read: if admin() || (signed() && request.auth.uid == uid);
+      allow create: if signed() && request.auth.uid == uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.statut == 'en_attente'
+        && okText(request.resource.data, 'nom', 120)
+        && okImg(request.resource.data, 'imgTiktok') && okImg(request.resource.data, 'imgYoutube') && okImg(request.resource.data, 'imgWhatsapp')
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'nom', 'statut', 'imgTiktok', 'imgYoutube', 'imgWhatsapp', 'createdAt']);
+      allow update: if signed() && resource.data.uid == request.auth.uid
+        && resource.data.statut == 'rejete' && request.resource.data.statut == 'en_attente'
+        && okImg(request.resource.data, 'imgTiktok') && okImg(request.resource.data, 'imgYoutube') && okImg(request.resource.data, 'imgWhatsapp')
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['statut', 'imgTiktok', 'imgYoutube', 'imgWhatsapp', 'createdAt']);
+      allow create, update, delete: if admin();
+    }
+
+    // ---------- Contenus publics ----------
+    match /facultes/{id} {
+      allow read: if admin() || resource.data.published == true;
+      allow create, update, delete: if admin();
+    }
+    match /formations/{id} {
+      allow read: if admin() || (resource.data.published == true && (resource.data.isPremium == false || premium()) && socialOk());
+      allow create, update, delete: if admin();
+    }
+    // Les ressources contiennent le lien du fichier : accès gratuit, Premium (si inclus) ou achat validé.
+    match /ressources/{id} {
+      allow read: if admin()
+        || (resource.data.published == true
+            && (resource.data.isPremium == false
+                || (resource.data.modeVente == 'Inclus Premium' && premium())))
+        || hasPurchase(id);
+      allow create, update, delete: if admin();
+    }
+    // Catalogue public (fiche descriptive + prix) des ressources payantes. Jamais d'URL de fichier ici.
+    match /produits/{id} {
+      allow read: if admin() || resource.data.published == true;
+      allow create, update, delete: if admin();
+    }
+    match /bourses/{id} {
+      allow read: if true;
+      allow create, update, delete: if admin();
+    }
+
+    // ---------- Achats à l'unité ----------
+    // id = uid_resourceId. L'étudiant crée seulement une DEMANDE « en_attente » ; l'admin valide ou refuse.
+    match /achats/{id} {
+      allow read: if admin() || (signed() && resource.data.uid == request.auth.uid);
+      allow create: if signed()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.resourceId is string
+        && id == request.auth.uid + '_' + request.resource.data.resourceId
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.statut == 'en_attente'
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'resourceId', 'productId', 'titre', 'prixFCFA', 'statut', 'type', 'createdAt']);
+      // Après un refus, l'étudiant peut seulement relancer sa demande.
+      allow update: if signed() && resource.data.uid == request.auth.uid
+        && resource.data.statut == 'refuse' && request.resource.data.statut == 'en_attente'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['statut', 'createdAt']);
+      allow create, update, delete: if admin();
+    }
+
+    // ---------- Abonnement Premium ----------
+    // id = uid_premium. Demande « en_attente » seulement ; l'activation (users) est faite par l'admin.
+    match /demandes_activation/{id} {
+      allow read: if signed() && (resource.data.uid == request.auth.uid || admin());
+      allow create: if signed()
+        && request.resource.data.uid == request.auth.uid
+        && id == request.auth.uid + '_premium'
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.statut == 'en_attente'
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'reference', 'operateur', 'type', 'montantFCFA', 'statut', 'createdAt']);
+      allow update: if signed() && resource.data.uid == request.auth.uid
+        && resource.data.statut != 'en_attente' && request.resource.data.statut == 'en_attente'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['statut', 'createdAt']);
+      allow create, update, delete: if admin();
+    }
+
+    // ---------- Missions ----------
+    match /missions/{id} {
+      allow read: if admin() || resource.data.active == true;
+      allow create, update, delete: if admin();
+    }
+    // id = uid_missionId : une seule soumission par étudiant et par mission (pas de doublon de points).
+    match /mission_submissions/{id} {
+      allow read: if admin() || (signed() && resource.data.uid == request.auth.uid);
+      allow create: if signed()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.missionId is string
+        && id == request.auth.uid + '_' + request.resource.data.missionId
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.statut == 'en_attente'
+        && request.resource.data.preuve is string
+        && request.resource.data.preuve.size() >= 8
+        && request.resource.data.preuve.size() <= 2000
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'missionId', 'missionTitre', 'preuve', 'statut', 'pointsDemandes', 'bonus', 'bonusResourceId', 'createdAt'])
+        && missionOpen(request.resource.data.missionId);
+      // Après un refus, l'étudiant peut corriger sa preuve et la renvoyer.
+      allow update: if signed() && resource.data.uid == request.auth.uid
+        && resource.data.statut == 'rejetee' && request.resource.data.statut == 'en_attente'
+        && request.resource.data.preuve is string
+        && request.resource.data.preuve.size() >= 8
+        && request.resource.data.preuve.size() <= 2000
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['preuve', 'statut', 'createdAt'])
+        && missionOpen(resource.data.missionId);
+      allow create, update, delete: if admin();
+    }
+
+    // ---------- Diagnostic administrateur (test d'écriture depuis admin.html) ----------
+    match /diagnostics/{id} {
+      allow read, create, update, delete: if admin();
+    }
+  }
+}

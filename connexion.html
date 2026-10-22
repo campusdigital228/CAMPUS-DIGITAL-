@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0e3b2c"><title>Connexion et inscription — CAMPUS DIGITAL</title><link rel="stylesheet" href="css/style.css"></head>
+<body class="page-connexion"><header id="hd"></header><main><div id="msg" class="msg" hidden></div><h1>Mon compte</h1>
+<section id="already" class="card" hidden><h2>Vous êtes déjà connecté</h2><p id="alreadyWho"></p><p><a class="btn dk" href="profil.html">Ouvrir mon profil</a> <a class="btn" href="bibliotheque.html">Aller à la bibliothèque</a></p></section>
+<div id="authBox">
+<p class="mode-tabs"><button type="button" class="btn" data-m="login">Connexion</button> <button type="button" class="btn" data-m="signup">Inscription</button> <button type="button" class="btn" data-m="reset">Mot de passe oublié</button></p>
+<form id="f" class="card" novalidate>
+  <div id="signupW" hidden>
+    <div class="form-row"><div><label for="prenom">Prénom *</label><input id="prenom" autocomplete="given-name"></div><div><label for="nom">Nom *</label><input id="nom" autocomplete="family-name"></div></div>
+    <div class="form-row"><div><label for="tel">Téléphone</label><input id="tel" type="tel" autocomplete="tel" placeholder="+228 …"></div><div><label for="ville">Ville</label><input id="ville" autocomplete="address-level2"></div></div>
+    <label for="univ">Université ou établissement</label><input id="univ" placeholder="Ex. Université de Lomé">
+    <div class="form-row"><div><label for="faculte">Faculté</label><select id="faculte"><option value="">— Choisir (facultatif) —</option></select></div><div><label for="niveau">Niveau d’études</label><select id="niveau"><option value="">— Choisir (facultatif) —</option></select></div></div>
+    <label for="formation">Formation / filière</label><input id="formation" placeholder="Si vous la connaissez déjà">
+    <p class="hint">Les champs académiques sont facultatifs : vous pourrez les compléter ou les modifier plus tard dans votre profil.</p>
+  </div>
+  <label for="email">E-mail *</label><input id="email" type="email" autocomplete="email" required>
+  <div id="pwW"><label for="pw">Mot de passe *</label><input id="pw" type="password" autocomplete="current-password" minlength="6"></div>
+  <div id="pw2W" hidden><label for="pw2">Confirmer le mot de passe *</label><input id="pw2" type="password" autocomplete="new-password" minlength="6"></div>
+  <button id="go" class="btn dk" type="submit">Se connecter</button>
+</form>
+<section id="googleBox" class="card"><p><b>Ou continuer avec Google</b></p><button id="google" class="btn" type="button">Continuer avec Google</button><p class="hint">Première connexion : votre profil étudiant est créé automatiquement. Aucun doublon n’est créé si vous avez déjà un profil.</p></section>
+<p class="hint">Besoin d’aide pour vous inscrire ? <span id="waHelp"></span></p>
+</div>
+</main><footer id="ft"></footer><script type="module" src="js/connexion.js"></script></body></html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0e3b2c">
+  <meta name="description" content="CAMPUS DIGITAL — Apprendre • Se former • Réussir : facultés, formations, bibliothèque, Premium et missions pour les étudiants.">
+  <title>CAMPUS DIGITAL — Apprendre • Se former • Réussir</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="home-page">
+  <header id="hd"></header>
+  <main class="home-main">
+    <div id="msg" class="msg" hidden></div>
+
+    <section class="home-hero" aria-labelledby="hero-title">
+      <div class="hero-orb orb-one"></div><div class="hero-orb orb-two"></div>
+      <div class="hero-copy" data-reveal="left">
+        <span class="eyebrow"><span class="eyebrow-dot"></span> APPRENDRE • SE FORMER • RÉUSSIR</span>
+        <h1 id="hero-title">Apprends mieux.<br><span>Va plus loin.</span></h1>
+        <p class="hero-lead">Facultés, formations, cours, livres et opportunités : tout ce qu’il te faut pour avancer dans tes études, réuni dans un seul espace pensé pour les étudiants.</p>
+        <form class="hero-search" action="recherche.html" method="get" role="search"><label class="sr-only" for="hq">Rechercher sur CAMPUS DIGITAL</label><input id="hq" name="q" type="search" placeholder="Rechercher un cours, une formation, un livre…" autocomplete="off" required><button class="btn dk" type="submit">Rechercher</button></form>
+        <div class="hero-actions">
+          <a class="btn home-primary" href="formations.html">Explorer les formations <span aria-hidden="true">↗</span></a>
+          <a class="btn" href="bibliotheque.html">Découvrir la bibliothèque</a>
+          <a class="btn dk" href="connexion.html?mode=signup">Rejoindre CAMPUS DIGITAL <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="hero-note"><span class="note-check">✓</span> Des ressources utiles, accessibles depuis ton téléphone.</div>
+      </div>
+      <div class="hero-visual" data-reveal="right" aria-label="Illustration de l'apprentissage numérique">
+        <div class="visual-backdrop"></div>
+        <div class="visual-card visual-main-card">
+          <div class="visual-top"><span class="visual-mark">CD</span><span class="visual-status"><i></i> Espace étudiant</span></div>
+          <div class="book-art"><div class="book book-back"></div><div class="book book-front"><span>APPRENDRE</span><b>sans<br>limites.</b><small>CAMPUS DIGITAL</small></div><span class="spark spark-a">✦</span><span class="spark spark-b">✳</span></div>
+          <div class="visual-bottom"><div><strong>Ton prochain chapitre</strong><small>Commence aujourd’hui</small></div><span class="round-arrow">↗</span></div>
+        </div>
+        <div class="float-chip chip-course"><span class="chip-icon">✎</span><span><b>Formations</b><small>Progresse à ton rythme</small></span></div>
+        <div class="float-chip chip-book"><span class="chip-icon">▤</span><span><b>Bibliothèque</b><small>Les ressources à portée de main</small></span></div>
+        <div class="visual-sticker">LE SAVOIR<br>EN MOUVEMENT <span>✦</span></div>
+      </div>
+      <a class="scroll-cue" href="#decouvrir"><span></span> DÉFILER POUR DÉCOUVRIR</a>
+    </section>
+
+    <section class="welcome-strip" id="decouvrir" data-reveal>
+      <div><span class="section-kicker">BIENVENUE SUR TON CAMPUS</span><h2>Un espace fait pour <em>ta réussite.</em></h2></div>
+      <p>Révise, découvre de nouvelles pistes et reste à l’affût des opportunités. Tu choisis ce dont tu as besoin, au moment où tu en as besoin.</p>
+    </section>
+
+    <section class="home-discover" aria-labelledby="discover-title">
+      <div class="section-heading" data-reveal>
+        <div><span class="section-kicker">À DÉCOUVRIR</span><h2 id="discover-title">Tout commence <em>ici.</em></h2></div>
+        <p>Ouvre une rubrique pour explorer son contenu : chaque carte mène vers une vraie page de la plateforme.</p>
+      </div>
+      <div class="discover-grid">
+        <a class="discover-card" href="facultes.html" data-reveal><div class="discover-card-top"><span class="discover-icon">⌘</span><span class="card-arrow">↗</span></div><span class="mini-label">S’ORIENTER</span><h3>Facultés & formations</h3><p>Choisis une faculté et vois directement les formations disponibles, avec leurs matières et leurs ressources.</p><span class="discover-link">Explorer les facultés <b>→</b></span><span class="card-watermark">01</span></a>
+        <a class="discover-card" href="formations.html" data-reveal><div class="discover-card-top"><span class="discover-icon">✎</span><span class="card-arrow">↗</span></div><span class="mini-label">APPRENDRE</span><h3>Cours & ressources pédagogiques</h3><p>Des cours et supports pour renforcer tes connaissances, filtrables par faculté, niveau ou mot-clé.</p><span class="discover-link">Voir les cours <b>→</b></span><span class="card-watermark">02</span></a>
+        <a class="discover-card" href="bibliotheque.html" data-reveal><div class="discover-card-top"><span class="discover-icon">▤</span><span class="card-arrow">↗</span></div><span class="mini-label">RÉVISER</span><h3>Livres & bibliothèque</h3><p>PDF, livres, fiches de révision, exercices et annales : en accès gratuit, Premium ou à l’unité.</p><span class="discover-link">Ouvrir la bibliothèque <b>→</b></span><span class="card-watermark">03</span></a>
+        <a class="discover-card" href="bourses.html" data-reveal><div class="discover-card-top"><span class="discover-icon">✦</span><span class="card-arrow">↗</span></div><span class="mini-label">VISER PLUS HAUT</span><h3>Bourses & opportunités</h3><p>Des pistes de bourses, avec les liens officiels pour vérifier conditions et dates.</p><span class="discover-link">Voir les opportunités <b>→</b></span><span class="card-watermark">04</span></a>
+      </div>
+    </section>
+
+    <section class="home-block premium-block" aria-labelledby="premium-title" data-reveal>
+      <div class="block-copy"><span class="section-kicker">PREMIUM</span><h2 id="premium-title">Va plus loin avec <em>Premium.</em></h2><p>Un accès de 30 jours aux contenus Premium. Les contenus gratuits restent toujours accessibles.</p><p class="price"><b>3 000 FCFA</b> <span>/ 30 jours</span></p><a class="btn home-primary" href="abonnement.html">Découvrir Premium <span aria-hidden="true">→</span></a></div>
+      <ul class="check-list"><li>Formations et ressources réservées aux abonnés</li><li>Activation après vérification du paiement par l’équipe</li><li>Renouvelable à tout moment</li><li>Documents à l’unité possibles sans abonnement</li></ul>
+    </section>
+
+    <section class="home-block missions-block" aria-labelledby="missions-title" data-reveal>
+      <div class="block-copy"><span class="section-kicker">MISSIONS & BONUS</span><h2 id="missions-title">Participe, <em>progresse, gagne.</em></h2><p>Lis un document, termine un cours, réponds à un questionnaire : envoie ta preuve et reçois des points ou un bonus après validation par l’équipe.</p><a class="btn home-primary" href="missions.html">Voir les missions <span aria-hidden="true">→</span></a></div>
+      <ul class="check-list"><li>Points attribués uniquement après validation</li><li>Bonus : document offert choisi par l’équipe</li><li>Une récompense par mission, sans doublon</li></ul>
+    </section>
+
+    <section class="home-advantages" aria-labelledby="adv-title">
+      <div class="section-heading" data-reveal><div><span class="section-kicker">POURQUOI CAMPUS DIGITAL</span><h2 id="adv-title">Pensé pour <em>les étudiants.</em></h2></div></div>
+      <div class="adv-grid">
+        <article class="adv-card" data-reveal><h3>Sur ton téléphone</h3><p>Une interface légère, lisible sur Android comme sur ordinateur.</p></article>
+        <article class="adv-card" data-reveal><h3>Du gratuit qui sert</h3><p>De vrais contenus gratuits ; le payant reste un complément.</p></article>
+        <article class="adv-card" data-reveal><h3>Paiements simples</h3><p>Demande sur WhatsApp, vérification manuelle, accès activé par l’équipe.</p></article>
+        <article class="adv-card" data-reveal><h3>Compte protégé</h3><p>Ton profil et tes accès sont protégés : personne ne peut s’attribuer Premium ou des points.</p></article>
+      </div>
+    </section>
+
+    <section class="home-steps" data-reveal>
+      <div class="steps-intro"><span class="section-kicker">SIMPLE COMME BONJOUR</span><h2>Ton parcours,<br><em>à ton rythme.</em></h2><p>Quelques étapes pour profiter de ton espace étudiant.</p><a class="btn home-primary" href="connexion.html?mode=signup">Commencer maintenant <span>→</span></a></div>
+      <div class="steps-list">
+        <article class="step-item" data-reveal><span class="step-number">01</span><div><h3>Crée ton espace</h3><p>Inscris-toi avec ton adresse e-mail pour retrouver ton profil.</p></div><span class="step-symbol">＋</span></article>
+        <article class="step-item" data-reveal><span class="step-number">02</span><div><h3>Explore les contenus</h3><p>Parcours les facultés, les formations, la bibliothèque et les bourses.</p></div><span class="step-symbol">⌕</span></article>
+        <article class="step-item" data-reveal><span class="step-number">03</span><div><h3>Avance à ton rythme</h3><p>Choisis les ressources adaptées à tes besoins et à tes objectifs.</p></div><span class="step-symbol">↗</span></article>
+      </div>
+    </section>
+
+    <section class="home-cta" data-reveal>
+      <div class="cta-decoration">✳</div><span class="section-kicker">LE PROCHAIN PAS T’APPARTIENT</span><h2>Prêt à écrire la suite ?</h2><p>Rejoins CAMPUS DIGITAL et donne plus de place à tes ambitions.</p><a class="btn cta-button" href="connexion.html?mode=signup">Rejoindre CAMPUS DIGITAL <span>→</span></a>
+    </section>
+  </main>
+  <footer id="ft"></footer>
+  <script type="module" src="js/accueil.js"></script>
+</body>
+</html>
